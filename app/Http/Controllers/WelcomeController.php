@@ -92,12 +92,12 @@ class WelcomeController extends Controller
 
         $url=array();
         $crawler->filter('.content-hardnews h2 a')->each(function($node) use(&$url){
-            $url[]=($node->attr('href'));
+            $url[]=$node->attr('href');
         });
 
         $tanggal=array();
         $crawler->filter('.content-hardnews span.mh-clock')->each(function($node) use(&$tanggal){
-            $tanggal[]=($node->text());
+            $tanggal[]=$node->text();
         });
 
         return array(
@@ -114,17 +114,17 @@ class WelcomeController extends Controller
 
         $title=array();
         $crawler->filter('.indeks-title')->each(function($node) use(&$title){
-            $title[]=($node->text());
+            $title[]=$node->text();
         });
 
         $url=array();
         $crawler->filter('.indeks-title a')->each(function($node) use(&$url){
-            $url[]=($node->attr('href'));
+            $url[]=$node->attr('href');
         });
 
         $tanggal=array();
         $crawler->filter('li p')->each(function($node) use(&$tanggal){
-            $tanggal[]=($node->text());
+            $tanggal[]=$node->text();
         });
 
         return array(
@@ -141,17 +141,17 @@ class WelcomeController extends Controller
 
         $title=array();
         $crawler->filter('h3.title-news-update')->each(function($node) use(&$title){
-            $title[]=($node->text());
+            $title[]=$node->text();
         });
 
         $url=array();
         $crawler->filter('ul.list-unstyled li a')->each(function($node) use(&$url){
-            $url[]=($node->attr('href'));
+            $url[]=$node->attr('href');
         });
 
         $tanggal=array();
         $crawler->filter('.news-excerpt div.date')->each(function($node) use(&$tanggal){
-            $tanggal[]=($node->text());
+            $tanggal[]=$node->text();
         });
 
         return array(
@@ -171,8 +171,33 @@ class WelcomeController extends Controller
         $tes3=preg_replace("/ ,/","", $tes2);
 
         return $tes3;
+    }
 
+    public function suara(Request $request){
+        $url = "https://www.suara.com/indeks";
+        $client = new Client();
+        $crawler = $client->request('GET', $url);
 
+        $title=array();
+        $crawler->filter('.item-content h4.post-title')->each(function($node) use(&$title){
+            $title[]=$node->text();
+        });
+
+        $url=array();
+        $crawler->filter('.item-content h4.post-title a.ellipsis2')->each(function($node) use(&$url){
+            $url[]=$node->attr('href');
+        });
+
+        $jam=array();
+        $crawler->filter('.suara-time')->each(function($node) use(&$jam){
+            $jam[]=$node->text();
+        });
+
+        return array(
+            'title'=>$title,
+            'url'=>$url, 
+            'jam'=>$jam
+        );
     }
     
 }

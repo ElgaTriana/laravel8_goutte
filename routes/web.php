@@ -25,4 +25,5 @@ Route::group(['prefix'=>'scrapping'], function(){
     Route::get('sindonews', [WelcomeController::class, 'sindonews']);
     Route::get('inewsid', [WelcomeController::class, 'inewsid']);
     Route::get('tes', [WelcomeController::class, 'tes']);
+    Route::get('suara', [WelcomeController::class, 'suara']);
 });
