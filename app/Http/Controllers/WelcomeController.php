@@ -10,8 +10,6 @@ class WelcomeController extends Controller
 {
     public function idntimes(Request $request){
 
-
-
         // $client = new \GuzzleHttp\Client();
         // $res = $client->request('GET',"https://www.idntimes.com/news");
         // return $res->getBody(true);
@@ -33,7 +31,6 @@ class WelcomeController extends Controller
         });
     }
 
-
     public function idntimestahap2(Request $request){
         $url = "{{URL::to('scrapping/idntimes')}}";
         $client = new Client();
@@ -43,7 +40,6 @@ class WelcomeController extends Controller
             dump($node);
         });       
     }
-
 
     public function antaranews(Request $request){
         $url = "https://www.antaranews.com/indeks";
