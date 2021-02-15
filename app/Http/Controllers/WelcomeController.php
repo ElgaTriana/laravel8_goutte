@@ -77,22 +77,22 @@ class WelcomeController extends Controller
     }
 
     public function okezone(Request $request){
-        $url = "https://idxchannel.okezone.com/";
+        $url = "https://megapolitan.okezone.com/indeks";
         $client = new Client();
         $crawler = $client->request('GET', $url);
 
         $title=array();
-        $crawler->filter('.content-hardnews p')->each(function($node) use(&$title){
-            $title[]=$node->text();
+        $crawler->filter('.content-hardnews .c-news a')->each(function($node) use(&$title){
+            $title[]=$node->attr('title');
         });
 
         $url=array();
-        $crawler->filter('.content-hardnews h2 a')->each(function($node) use(&$url){
+        $crawler->filter('.content-hardnews .c-news a')->each(function($node) use(&$url){
             $url[]=$node->attr('href');
         });
 
         $tanggal=array();
-        $crawler->filter('.content-hardnews span.mh-clock')->each(function($node) use(&$tanggal){
+        $crawler->filter('time.category-hardnews')->each(function($node) use(&$tanggal){
             $tanggal[]=$node->text();
         });
 
@@ -104,7 +104,7 @@ class WelcomeController extends Controller
     }
 
     public function sindonews(Request $request){
-        $url = "https://index.sindonews.com/";
+        $url = "https://index.sindonews.com/index/600";
         $client = new Client();
         $crawler = $client->request('GET', $url);
 
@@ -131,7 +131,7 @@ class WelcomeController extends Controller
     }
 
     public function inewsid(Request $request){
-        $url = "https://www.inews.id/indeks";
+        $url = "https://www.inews.id/indeks/infografis/";
         $client = new Client();
         $crawler = $client->request('GET', $url);
 
