@@ -104,7 +104,7 @@ class WelcomeController extends Controller
     }
 
     public function sindonews(Request $request){
-        $url = "https://index.sindonews.com/index/600";
+        $url = "https://index.sindonews.com/index/612";
         $client = new Client();
         $crawler = $client->request('GET', $url);
 
