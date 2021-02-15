@@ -6,7 +6,7 @@ use Illuminate\Console\Command;
 
 use Goutte\Client;
 
-class scrapOkezone extends Command
+class ScrapOkezone extends Command
 {
     /**
     * The name and git signature of the console command.

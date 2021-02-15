@@ -6,7 +6,7 @@ use Illuminate\Console\Command;
 
 use Goutte\Client;
 
-class scrapSindo extends Command
+class ScrapSindo extends Command
 {
     /**
     * The name and signature of the console command.

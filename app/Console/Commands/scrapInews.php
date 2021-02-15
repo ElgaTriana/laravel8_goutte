@@ -6,7 +6,7 @@ use Illuminate\Console\Command;
 
 use Goutte\Client;
 
-class scrapInews extends Command
+class ScrapInews extends Command
 {
     /**
     * The name and signature of the console command.
