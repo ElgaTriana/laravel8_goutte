@@ -10,23 +10,11 @@ class WelcomeController extends Controller
 {
     public function idntimes(Request $request){
 
-        // $client = new \GuzzleHttp\Client();
-        // $res = $client->request('GET',"https://www.idntimes.com/news");
-        // return $res->getBody(true);
-
-        // $url = "https://www.tribunnews.com/indeks";
-        // $url = "https://www.idntimes.com/news/indonesia/gregorius-pranandito/anggaran-rehabilitasi-rumah-dinas-anies-capai-rp24-miliar";
         $url = "https://www.idntimes.com/news";
         $client = new Client();
         $crawler = $client->request('GET', $url);
 
-        // Tribun
-        // $crawler->filter('h3.f16 a')->each(function($node) use(&$url){
-        //     dump($node->attr('title'));
-        // });
-
-        // idntimes
-        $crawler->filter('h1')->each(function($node) use(&$url){
+        $crawler->filter('.container')->each(function($node) use(&$url){
             dump($node);
         });
     }
@@ -77,17 +65,17 @@ class WelcomeController extends Controller
     }
 
     public function okezone(Request $request){
-        $url = "https://megapolitan.okezone.com/indeks";
+        $url = "https://celebrity.okezone.com/indeks/";
         $client = new Client();
         $crawler = $client->request('GET', $url);
 
         $title=array();
-        $crawler->filter('.content-hardnews .c-news a')->each(function($node) use(&$title){
+        $crawler->filter('.content-hardnews .c-celebrity a')->each(function($node) use(&$title){
             $title[]=$node->attr('title');
         });
 
         $url=array();
-        $crawler->filter('.content-hardnews .c-news a')->each(function($node) use(&$url){
+        $crawler->filter('.content-hardnews .c-celebrity a')->each(function($node) use(&$url){
             $url[]=$node->attr('href');
         });
 
@@ -131,7 +119,7 @@ class WelcomeController extends Controller
     }
 
     public function inewsid(Request $request){
-        $url = "https://www.inews.id/indeks/infografis/";
+        $url = "https://www.inews.id/indeks/sport";
         $client = new Client();
         $crawler = $client->request('GET', $url);
 
@@ -196,4 +184,37 @@ class WelcomeController extends Controller
         );
     }
     
+    public function deskripsiokezone(Request $request){
+        $url = "https://www.inews.id/sport/soccer/gara-gara-bikin-tato-aubameyang-langgar-protokol-kesehatan";
+        $client = new Client();
+        $crawler = $client->request('GET', $url);
+
+        $deskripsi=array();
+        $crawler->filter('meta[property*="og:description"]')->each(function($node) use(&$deskripsi){
+            // $deskripsi=$node->attr('content');
+            dump($node->attr('content'));
+        });
+    }
+
+    public function deskripsisindonews(Request $request){
+        $url = "https://metro.sindonews.com/read/337950/171/sofyan-djalil-resmikan-kantor-perwakilan-bpn-wilayah-cileungsi-1613541729";
+        $client = new Client();
+        $crawler = $client->request('GET', $url);
+
+        $deskripsi=array();
+        $crawler->filter('meta[property*="og:description"]')->each(function($node) use(&$deskripsi){
+            $deskripsi=$node->attr('content');
+        });
+    }
+
+    public function deskripsiinewsid(Request $request){
+        $url = "https://www.inews.id/travel/kuliner/makanan-khas-toraja";
+        $client = new Client();
+        $crawler = $client->request('GET', $url);
+
+        $deskripsi=array();
+        $crawler->filter('meta[property*="og:description"]')->each(function($node) use(&$deskripsi){
+            $deskripsi=$node->attr('content');
+        });
+    }
 }

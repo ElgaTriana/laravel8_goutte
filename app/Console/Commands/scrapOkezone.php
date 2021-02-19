@@ -57,16 +57,34 @@ class ScrapOkezone extends Command
                 $client = new Client();
                 $url = $kan->url_kanal;
                 $crawler = $client->request('GET', $url);
-                
+
                 $title=array();
-                $crawler->filter('.content-hardnews .c-news a')->each(function($node) use(&$title){
-                    $title[]=$node->attr('title');
-                });
-                
                 $list_url=array();
-                $crawler->filter('.content-hardnews .c-news a')->each(function($node) use(&$list_url){
-                    $list_url[]=$node->attr('href');
-                });
+                if($url=="https://celebrity.okezone.com/indeks/"){
+                    $crawler->filter('.content-hardnews .c-celebrity a')->each(function($node) use(&$title){
+                        $title[]=$node->attr('title');
+                    });
+
+                    $crawler->filter('.content-hardnews .c-celebrity a')->each(function($node) use(&$list_url){
+                        $list_url[]=$node->attr('href');
+                    });
+                }else if($url=="https://techno.okezone.com/indeks"){
+                    $crawler->filter('.content-hardnews .c-techno a')->each(function($node) use(&$title){
+                        $title[]=$node->attr('title');
+                    });
+
+                    $crawler->filter('.content-hardnews .c-techno a')->each(function($node) use(&$list_url){
+                        $list_url[]=$node->attr('href');
+                    });
+                }else{
+                    $crawler->filter('.content-hardnews .c-news a')->each(function($node) use(&$title){
+                        $title[]=$node->attr('title');
+                    });
+
+                    $crawler->filter('.content-hardnews .c-news a')->each(function($node) use(&$list_url){
+                        $list_url[]=$node->attr('href');
+                    });
+                }
                 
                 $tanggal=array();
                 $crawler->filter('time.category-hardnews')->each(function($node) use(&$tanggal){

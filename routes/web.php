@@ -26,4 +26,7 @@ Route::group(['prefix'=>'scrapping'], function(){
     Route::get('inewsid', [WelcomeController::class, 'inewsid']);
     Route::get('tes', [WelcomeController::class, 'tes']);
     Route::get('suara', [WelcomeController::class, 'suara']);
+    Route::get('deskripsiokezone',[WelcomeController::class, 'deskripsiokezone']);
+    Route::get('deskripsisindonews', [WelcomeController::class, 'deskripsisindonews']);
+    Route::get('deskripsiinewsid', [WelcomeController::class, 'deskripsiinewsid']);
 });
