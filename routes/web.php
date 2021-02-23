@@ -29,4 +29,6 @@ Route::group(['prefix'=>'scrapping'], function(){
     Route::get('deskripsiokezone',[WelcomeController::class, 'deskripsiokezone']);
     Route::get('deskripsisindonews', [WelcomeController::class, 'deskripsisindonews']);
     Route::get('deskripsiinewsid', [WelcomeController::class, 'deskripsiinewsid']);
+    Route::get('getdataidntimes', [WelcomeController::class, 'getdataidntimes']);
+    Route::get('idntimesnih', [WelcomeController::class, 'idntimesnih']);
 });

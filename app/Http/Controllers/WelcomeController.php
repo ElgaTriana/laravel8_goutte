@@ -6,6 +6,8 @@ use Illuminate\Http\Request;
 
 use Goutte\Client;
 
+use Carbon\Carbon;
+
 class WelcomeController extends Controller
 {
     public function idntimes(Request $request){
@@ -216,5 +218,27 @@ class WelcomeController extends Controller
         $crawler->filter('meta[property*="og:description"]')->each(function($node) use(&$deskripsi){
             $deskripsi=$node->attr('content');
         });
+    }
+
+    public function getdataidntimes(Request $request){
+        $var =\DB::connection('mysql3')->table('scrap_portal_parameter_dummy as a')->selectRaw('a.*')
+        ->whereDate('a.tanggal', Carbon::today())
+        ->get();
+
+        $title=array();
+        $url=array();
+        $tanggal=array();
+
+        foreach($var as $i=>$val){
+            $title[]=$val->judul_artikel;
+            $url[]=$val->link_artikel;
+            $tanggal[]=$val->tanggal_publish;
+        }
+
+        return array(
+            'title'=>$url,
+            'url'=>$title, 
+            'tanggal'=>$tanggal
+        );
     }
 }
