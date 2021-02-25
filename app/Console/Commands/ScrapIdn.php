@@ -39,164 +39,137 @@ class ScrapIdn extends Command
      */
     public function handle()
     {
-        $list_portal = \App\Models\Scrap\Portal::with(
-        [
-            'kanal',
-            'kanal.subkanal'
-        ]
-        )->find(9);
+        $this->info('Mulai');
 
-        $this->info('Memulai');
+        $var = \App\Models\Scrap\Parameter_dummy::where('tanggal', date('Y-m-d'))
+            ->where('dibaca','N')
+            ->get();
 
-        foreach($list_portal->kanal as $kan)
+        foreach($var as $s=>$t)
         {
-            if($kan->type == "indeks")
+            $link_artikel = $t->link_artikel;
+            $judul_artikel = $t->judul_artikel;
+
+            $this->info($judul_artikel);
+
+            $cek = \App\Models\Scrap\Parameter::where('judul_artikel',$t->judul_artikel)
+                    ->orWhere('link_artikel',$t->link_artikel)
+                    ->first();  
+                    
+            if($cek == null)
             {
-                $this->info('Menarik Data == '.$kan->url_kanal);
-                
-                $var =\DB::connection('mysql3')->table('scrap_portal_parameter_dummy as a')->selectRaw('a.*')
-                ->whereDate('a.tanggal', Carbon::today())
-                ->where('dibaca', 'N')
-                ->get();
+                $param = new \App\Models\Scrap\Parameter;
+                $param->tanggal = date('Y-m-d');
+                $param->jam = date('H:i:s');
 
-                $title=array();
-                $list_url=array();
-                $tanggal=array();
-
-                foreach($var as $i=>$val){
-                    $title[]=$val->link_artikel;
-                    $list_url[]=$val->judul_artikel;
-                    $tanggal[]=$val->tanggal_publish;
+                if(stripos($list_url[$s], 'https://www.idntimes.com/travel') !== FALSE){
+                    $param->kanal_id = 314;
+                }else if(stripos($list_url[$s], 'https://www.idntimes.com/health') !== FALSE){
+                    $param->kanal_id = 313;
+                }else if(stripos($list_url[$s], 'https://www.idntimes.com/life') !== FALSE){
+                    $param->kanal_id = 312;
+                }else if(stripos($list_url[$s], 'https://www.idntimes.com/hype') !== FALSE){
+                    $param->kanal_id = 311;
+                }else if(stripos($list_url[$s], 'https://www.idntimes.com/tech') !== FALSE){
+                    $param->kanal_id = 310;
+                }else if(stripos($list_url[$s], 'https://www.idntimes.com/sport') !== FALSE){
+                    $param->kanal_id = 309;
+                }else if(stripos($list_url[$s], 'https://www.idntimes.com/business') !== FALSE){
+                    $param->kanal_id = 308;
+                }else if(stripos($list_url[$s], 'https://www.idntimes.com/news') !== FALSE){
+                        $param->kanal_id = 298;
+                }else{
+                    $param->kanal_id = 0;
                 }
+
+                $param->judul_artikel = $t->judul_artikel;
+                $param->link_artikel = $t->link_artikel;
+                $param->tanggal_publish = $t->tanggal_publish;
                 
-                if(count($title) == count($tanggal))
-                {
-                    foreach($title as $s=>$t)
+                $simpanparam = $param->save();
+                
+                if($simpanparam){
+
+                    $cek_kanal_parameter = \App\Models\Scrap\Kanalparameter::where('parameter_id', $param->id)
+                        ->where('kanal_id', $param->kanal_id)
+                        ->count();
+                    
+                    if($cek_kanal_parameter == 0)
                     {
-                        $cek = \App\Models\Scrap\Parameter::where('judul_artikel',$t)
-                        ->orWhere('link_artikel',$list_url[$s])
-                        ->first();         
-                        
-                        if($cek == null)
-                        {
-                            $param = new \App\Models\Scrap\Parameter;
-                            $param->tanggal = date('Y-m-d');
-                            $param->jam = date('H:i:s');
-                            if(stripos($list_url[$s], 'https://www.idntimes.com/travel') !== FALSE){
-                                $param->kanal_id = 210;
-                            }else if(stripos($list_url[$s], 'https://www.idntimes.com/health') !== FALSE){
-                                $param->kanal_id = 209;
-                            }else if(stripos($list_url[$s], 'https://www.idntimes.com/life') !== FALSE){
-                                $param->kanal_id = 208;
-                            }else if(stripos($list_url[$s], 'https://www.idntimes.com/hype') !== FALSE){
-                                $param->kanal_id = 207;
-                            }else if(stripos($list_url[$s], 'https://www.idntimes.com/tech') !== FALSE){
-                                $param->kanal_id = 206;
-                            }else if(stripos($list_url[$s], 'https://www.idntimes.com/sport') !== FALSE){
-                                $param->kanal_id = 205;
-                            }else if(stripos($list_url[$s], 'https://www.idntimes.com/business') !== FALSE){
-                                $param->kanal_id = 204;
-                            }else if(stripos($list_url[$s], 'https://www.idntimes.com/news') !== FALSE){
-                                    $param->kanal_id = 203;
-                            }else{
-                                $param->kanal_id = 0;
-                            }
-                            $param->judul_artikel = $t;
-                            $param->link_artikel = $list_url[$s];
-                            $param->tanggal_publish = $tanggal[$s];
-                            
-                            $simpanparam = $param->save();
+                        $p = new \App\Models\Scrap\Kanalparameter;
+                        $p->parameter_id = $param->id;
 
-                            $updatedibaca=\App\Models\Scrap\Parameter_dummy::where('judul_artikel',$t)
-                            ->where('dibaca', 'N')
-                            ->update(
-                                [
-                                    'dibaca'=>'Y'
-                                ]
-                            );
-                            
-                            if($simpanparam){
-                                $cek_kanal_parameter = \App\Models\Scrap\Kanalparameter::where('parameter_id', $param->id)
-                                ->where('kanal_id', $kan->id)
-                                ->count();
-                                
-                                if($cek_kanal_parameter == 0)
-                                {
-                                    $p = new \App\Models\Scrap\Kanalparameter;
-                                    $p->parameter_id = $param->id;
-
-                                    if(stripos($list_url[$s], 'https://www.idntimes.com/travel') !== FALSE){
-                                        $p->kanal_id = 210;
-                                    }else if(stripos($list_url[$s], 'https://www.idntimes.com/health') !== FALSE){
-                                        $p->kanal_id = 209;
-                                    }else if(stripos($list_url[$s], 'https://www.idntimes.com/life') !== FALSE){
-                                        $p->kanal_id = 208;
-                                    }else if(stripos($list_url[$s], 'https://www.idntimes.com/hype') !== FALSE){
-                                        $p->kanal_id = 207;
-                                    }else if(stripos($list_url[$s], 'https://www.idntimes.com/tech') !== FALSE){
-                                        $p->kanal_id = 206;
-                                    }else if(stripos($list_url[$s], 'https://www.idntimes.com/sport') !== FALSE){
-                                        $p->kanal_id = 205;
-                                    }else if(stripos($list_url[$s], 'https://www.idntimes.com/business') !== FALSE){
-                                        $p->kanal_id = 204;
-                                    }else if(stripos($list_url[$s], 'https://www.idntimes.com/news') !== FALSE){
-                                        $p->kanal_id = 203;
-                                    }else{
-                                        $p->kanal_id = 0;
-                                    }
-
-                                    $p->portal_id = 9;
-                                    $p->save();
-                                }
-                            }
+                        if(stripos($list_url[$s], 'https://www.idntimes.com/travel') !== FALSE){
+                            $p->kanal_id = 314;
+                        }else if(stripos($list_url[$s], 'https://www.idntimes.com/health') !== FALSE){
+                            $p->kanal_id = 313;
+                        }else if(stripos($list_url[$s], 'https://www.idntimes.com/life') !== FALSE){
+                            $p->kanal_id = 312;
+                        }else if(stripos($list_url[$s], 'https://www.idntimes.com/hype') !== FALSE){
+                            $p->kanal_id = 311;
+                        }else if(stripos($list_url[$s], 'https://www.idntimes.com/tech') !== FALSE){
+                            $p->kanal_id = 310;
+                        }else if(stripos($list_url[$s], 'https://www.idntimes.com/sport') !== FALSE){
+                            $p->kanal_id = 309;
+                        }else if(stripos($list_url[$s], 'https://www.idntimes.com/business') !== FALSE){
+                            $p->kanal_id = 308;
+                        }else if(stripos($list_url[$s], 'https://www.idntimes.com/news') !== FALSE){
+                                $p->kanal_id = 298;
                         }else{
-                            $cek_kanal_parameter = \App\Models\Scrap\Kanalparameter::where('parameter_id', $cek->id)
-                            ->where('kanal_id', $kan->id)
-                            ->count();
-                            
-                            if($cek_kanal_parameter == 0)
-                            {
-                                $p = new \App\Models\Scrap\Kanalparameter;
-                                $p->parameter_id = $cek->id;
-
-                                    if(stripos($list_url[$s], 'https://www.idntimes.com/travel') !== FALSE){
-                                        $p->kanal_id = 210;
-                                    }else if(stripos($list_url[$s], 'https://www.idntimes.com/health') !== FALSE){
-                                        $p->kanal_id = 209;
-                                    }else if(stripos($list_url[$s], 'https://www.idntimes.com/life') !== FALSE){
-                                        $p->kanal_id = 208;
-                                    }else if(stripos($list_url[$s], 'https://www.idntimes.com/hype') !== FALSE){
-                                        $p->kanal_id = 207;
-                                    }else if(stripos($list_url[$s], 'https://www.idntimes.com/tech') !== FALSE){
-                                        $p->kanal_id = 206;
-                                    }else if(stripos($list_url[$s], 'https://www.idntimes.com/sport') !== FALSE){
-                                        $p->kanal_id = 205;
-                                    }else if(stripos($list_url[$s], 'https://www.idntimes.com/business') !== FALSE){
-                                        $p->kanal_id = 204;
-                                    }else if(stripos($list_url[$s], 'https://www.idntimes.com/news') !== FALSE){
-                                            $p->kanal_id = 203;
-                                    }else{
-                                        $p->kanal_id = 0;
-                                    }
-
-                                
-                                $p->portal_id = $list_portal->id;
-                                $p->save();
-
-                                $updatedibaca=\App\Models\Scrap\Parameter_dummy::where('judul_artikel',$t)
-                                ->where('dibaca', 'N')
-                                ->update(
-                                    [
-                                        'dibaca'=>'Y'
-                                    ]
-                                );
-                            }
+                            $p->kanal_id = 0;
                         }
+
+                        $p->portal_id = 8;
+                        $p->save();
                     }
                 }
+            }else{
+                if(stripos($cek->link_artikel, 'https://www.idntimes.com/travel') !== FALSE){
+                    $kanal_id = 314;
+                }else if(stripos($cek->link_artikel, 'https://www.idntimes.com/health') !== FALSE){
+                    $kanal_id = 313;
+                }else if(stripos($cek->link_artikel, 'https://www.idntimes.com/life') !== FALSE){
+                    $kanal_id = 312;
+                }else if(stripos($cek->link_artikel, 'https://www.idntimes.com/hype') !== FALSE){
+                    $kanal_id = 311;
+                }else if(stripos($cek->link_artikel, 'https://www.idntimes.com/tech') !== FALSE){
+                    $kanal_id = 310;
+                }else if(stripos($cek->link_artikel, 'https://www.idntimes.com/sport') !== FALSE){
+                    $kanal_id = 309 ;
+                }else if(stripos($cek->link_artikel, 'https://www.idntimes.com/business') !== FALSE){
+                    $kanal_id = 308;
+                }else if(stripos($cek->link_artikel, 'https://www.idntimes.com/news') !== FALSE){
+                        $kanal_id = 298;
+                }else{
+                    $kanal_id = 0;
+                }
+
+                $cek_kanal_parameter = \App\Models\Scrap\Kanalparameter::where('parameter_id', $cek->id)
+                    ->where('kanal_id', $kanal_id)
+                    ->count();
+                
+                if($cek_kanal_parameter == 0)
+                {
+                    $p = new \App\Models\Scrap\Kanalparameter;
+                    $p->parameter_id = $cek->id;
+                    $p->kanal_id = $kanal_id;
+                    $p->portal_id = $list_portal->id;
+                    $p->save();
+
+                    
+                }
             }
+
+            $this->info('Update == '.$t->id);
+            
+            \App\Models\Scrap\Parameter_dummy::where('id', $t->id)
+                    ->update(
+                        [
+                            'dibaca'=>'Y'
+                        ]
+                    );
         }
-        
+
         $this->info('Selesai');
     }
 }
