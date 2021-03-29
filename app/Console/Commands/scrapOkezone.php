@@ -44,7 +44,7 @@ class ScrapOkezone extends Command
             'kanal',
             'kanal.subkanal'
         ]
-        )->find(7);
+        )->find(8);
                 
         $this->info('Memulai');
             
@@ -52,6 +52,8 @@ class ScrapOkezone extends Command
         {
             if($kan->type == "indeks")
             {
+                $this->info('Menarik Data Kanal Index');
+                
                 $this->info('Menarik Data == '.$kan->url_kanal);
                 
                 $client = new Client();
@@ -137,6 +139,87 @@ class ScrapOkezone extends Command
                                 $p->kanal_id = $kan->id;
                                 $p->portal_id = $list_portal->id;
                                 $p->save();
+                            }
+                        }
+                    }
+                }
+                
+                $this->info('Selesai Menarik Data Kanal Index');
+            }
+            else if($kan->type == "terpopuler"){
+
+                foreach($list_portal->kanal as $kan)
+                {
+                    
+                    $this->info('Menarik Data Kanal Terpopuler');
+
+                    $this->info('Menarik Data == '.$kan->url_kanal);
+
+                    $client2 = new Client();
+                    $url2 = $kan->url_kanal;
+                    $crawler2 = $client2->request('GET', $url2);
+
+                    $title2=array();
+                    $crawler2->filter('.content-hardnews h4 a')->each(function($node2) use(&$title2){
+                        $title2[]=$node2->text();
+                    });
+
+                    $url2=array();
+                    $crawler2->filter('.content-hardnews h4 a')->each(function($node2) use(&$url2){
+                        $url2[]=$node2->attr('href');
+                    });
+
+                    $tanggal2=array();
+                    $crawler2->filter('time.category-hardnews')->each(function($node2) use(&$tanggal2){
+                        $tanggal2[]=$node2->text();
+                    });
+
+                    if(count($title2) == count($url2)){
+                        foreach($title2 as $s=>$t)
+                        {
+                            $cek = \App\Models\Scrap\Parameter::where('judul_artikel',$t)
+                            ->orWhere('link_artikel',$url2[$s])
+                            ->first();
+                            
+                            if($cek == null)
+                            {
+                                $param = new \App\Models\Scrap\Parameter;
+                                $param->tanggal = date('Y-m-d');
+                                $param->jam = date('H:i:s');
+                                $param->kanal_id = $kan->id;
+                                $param->judul_artikel = $t;
+                                $param->link_artikel = $url2[$s];
+                                $param->tanggal_publish = $tanggal2[$s];
+                                
+                                $simpanparam = $param->save();
+                                
+                                if($simpanparam){
+                                    $cek_kanal_parameter = \App\Models\Scrap\Kanalparameter::where('parameter_id', $param->id)
+                                    ->where('kanal_id', $kan->id)
+                                    ->count();
+                                    
+                                    if($cek_kanal_parameter == 0)
+                                    {
+                                        $p = new \App\Models\Scrap\Kanalparameter;
+                                        $p->parameter_id = $param->id;
+                                        $p->kanal_id = $kan->id;
+                                        $p->portal_id = $list_portal->id;
+                                        $p->save();
+                                    }
+                                }
+                            }else{
+                                $cek_kanal_parameter = \App\Models\Scrap\Kanalparameter::where('parameter_id', $cek->id)
+                                ->where('kanal_id', $kan->id)
+                                ->count();
+                                
+                                if($cek_kanal_parameter == 0)
+                                {
+                                    $p = new \App\Models\Scrap\Kanalparameter;
+                                    $p->parameter_id = $cek->id;
+                                    $p->kanal_id = $kan->id;
+                                    $p->portal_id = $list_portal->id;
+                                    $p->save();
+                                }
                             }
                         }
                     }

@@ -67,17 +67,17 @@ class WelcomeController extends Controller
     }
 
     public function okezone(Request $request){
-        $url = "https://celebrity.okezone.com/indeks/";
+        $url = "https://index.okezone.com/populer";
         $client = new Client();
         $crawler = $client->request('GET', $url);
 
         $title=array();
-        $crawler->filter('.content-hardnews .c-celebrity a')->each(function($node) use(&$title){
-            $title[]=$node->attr('title');
+        $crawler->filter('.content-hardnews h4 a')->each(function($node) use(&$title){
+            $title[]=$node->text();
         });
 
         $url=array();
-        $crawler->filter('.content-hardnews .c-celebrity a')->each(function($node) use(&$url){
+        $crawler->filter('.content-hardnews h4 a')->each(function($node) use(&$url){
             $url[]=$node->attr('href');
         });
 
@@ -94,7 +94,7 @@ class WelcomeController extends Controller
     }
 
     public function sindonews(Request $request){
-        $url = "https://index.sindonews.com/index/612";
+        $url = "https://index.sindonews.com/popular";
         $client = new Client();
         $crawler = $client->request('GET', $url);
 
@@ -148,15 +148,30 @@ class WelcomeController extends Controller
     }
 
     public function tes(Request $request){
-        $date="Kamis, 11 Februari 2021 - 06:52 WIB";
+        $url = "https://www.liputan6.com/popular";
+        $client = new Client();
+        $crawler = $client->request('GET', $url);   
 
-        $date1=explode(', ',$date);
+        $title = array();
+        $crawler->filter('h4.articles--iridescent-list--text-item__title')->each(function($node) use(&$title){
+            $title[]= $node->text();
+        });
 
-        $tes2=preg_replace("/ WIB/","", $date1);
+        $url = array();
+        $crawler->filter('h4.articles--iridescent-list--text-item__title a')->each(function($node) use(&$url){
+            $url[]= $node->attr("href");
+        });
 
-        $tes3=preg_replace("/ ,/","", $tes2);
+        $tanggal = array();
+        $crawler->filter('.articles--iridescent-list--text-item__datetime time')->each(function($node) use(&$tanggal){
+            $tanggal[]= $node->text();
+        });
 
-        return $tes3;
+        return array(
+            'title'=>$title,
+            'url'=>$url,
+            'tanggal'=>$tanggal
+        );
     }
 
     public function suara(Request $request){
@@ -238,6 +253,36 @@ class WelcomeController extends Controller
         return array(
             'title'=>$url,
             'url'=>$title, 
+            'tanggal'=>$tanggal
+        );
+    }
+
+    public function liputan6(Request $request)
+    {
+        return "sini";
+        $url = "https://www.liputan6.com/global/indeks";
+        $client = new Client();
+        $crawler = $client->request('GET', $url);   
+
+        $title = array();
+        $crawler->filter('h4.articles--rows--item__title')->each(function($node) use(&$title){
+            // dump($node->text());
+            $title[]= $node->text();
+        });
+
+        $url = array();
+        $crawler->filter('a.articles--rows--item__title-link')->each(function($node) use(&$url){
+            $url[]= $node->attr("href");
+        });
+
+        $tanggal = array();
+        $crawler->filter('.articles--rows--item__time')->each(function($node) use(&$tanggal){
+            $tanggal[]= $node->text();
+        });
+
+        return array(
+            'title'=>$title,
+            'url'=>$url,
             'tanggal'=>$tanggal
         );
     }

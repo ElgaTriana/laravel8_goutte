@@ -31,4 +31,5 @@ Route::group(['prefix'=>'scrapping'], function(){
     Route::get('deskripsiinewsid', [WelcomeController::class, 'deskripsiinewsid']);
     Route::get('getdataidntimes', [WelcomeController::class, 'getdataidntimes']);
     Route::get('idntimesnih', [WelcomeController::class, 'idntimesnih']);
+    Route::get('liputan6', [WelcomeController::class, 'liputan6']);
 });
