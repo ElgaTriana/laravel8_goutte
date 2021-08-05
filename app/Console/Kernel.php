@@ -13,7 +13,12 @@ class Kernel extends ConsoleKernel
      * @var array
      */
     protected $commands = [
-        //
+        Commands\ScrapPortal::class,
+        Commands\ScrapLiputannam::class,
+        Commands\ScrapInews::class,
+        Commands\ScrapOkezone::class,
+        Commands\ScrapSindo::class,
+        Commands\ScrapIdntimes::class,
     ];
 
     /**
@@ -25,6 +30,30 @@ class Kernel extends ConsoleKernel
     protected function schedule(Schedule $schedule)
     {
         // $schedule->command('inspire')->hourly();
+
+        // $schedule->command('scrap:portal')
+        // ->timezone('Asia/Jakarta')  
+        // ->everyFifteenMinutes();
+
+        // $schedule->command('scrap:liputannam')
+        // ->timezone('Asia/Jakarta')  
+        // ->everyFifteenMinutes();
+
+        // $schedule->command('scrap:inews')
+        // ->timezone('Asia/Jakarta')  
+        // ->everyFifteenMinutes();
+
+        // $schedule->command('scrap:sindo')
+        // ->timezone('Asia/Jakarta')  
+        // ->everyFifteenMinutes();
+
+        // $schedule->command('scrap:okezone')
+        // ->timezone('Asia/Jakarta')  
+        // ->everyFifteenMinutes();
+
+        // $schedule->command('scrap:idn')
+        // ->timezone('Asia/Jakarta')  
+        // ->everyFifteenMinutes();
     }
 
     /**

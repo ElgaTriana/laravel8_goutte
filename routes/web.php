@@ -32,4 +32,19 @@ Route::group(['prefix'=>'scrapping'], function(){
     Route::get('getdataidntimes', [WelcomeController::class, 'getdataidntimes']);
     Route::get('idntimesnih', [WelcomeController::class, 'idntimesnih']);
     Route::get('liputan6', [WelcomeController::class, 'liputan6']);
+    Route::get('detik', [WelcomeController::class, 'detik']);
+    Route::get('kompas', [WelcomeController::class, 'kompas']);
+    Route::get('idxchannel', [WelcomeController::class, 'idxchannel']);
+    
+    Route::get('tokped', [WelcomeController::class, 'tokped']);
+    Route::get('tokped-detail-produk', [WelcomeController::class, 'tokped_detail_produk']);
+    Route::get('tokped-produk', [WelcomeController::class, 'tokped_produk']);
+
+    Route::get('homepagedetik', [WelcomeController::class, 'homepagedetik']);
+    Route::get('homepagekompas', [WelcomeController::class, 'homepagekompas']);
+    Route::get('homepagetribun', [WelcomeController::class, 'homepagetribun']);
+    Route::get('homepageliputan6', [WelcomeController::class, 'homepageliputan6']);
+    Route::get('homepageinewsid', [WelcomeController::class, 'homepageinewsid']);
+    Route::get('homepagesindonews', [WelcomeController::class, 'homepagesindonews']);
+    Route::get('homepageokezone', [WelcomeController::class, 'homepageokezone']);
 });

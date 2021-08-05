@@ -12,8 +12,7 @@ class Portal extends Model
     use SoftDeletes;
 
     public function kanal(){
-        return $this->hasMany('App\Models\Scrap\Kanal','portal_id')
-            ->where('type_kanal','Artikel');
+        return $this->hasMany('App\Models\Scrap\Kanal','portal_id');
     }
 
 }

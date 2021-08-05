@@ -90,6 +90,16 @@ class ScrapInews extends Command
                             $param->judul_artikel = $t;
                             $param->link_artikel = $list_url[$s];
                             $param->tanggal_publish = $tanggal[$s];
+
+                            $cek=strpos($tanggal[$s],"WIB",0)-1;
+                            
+                            $tgl=date('Y-m-d');
+
+                            $wib=substr($tanggal[$s],0,$cek);
+
+                            $jam=substr($wib,-8);
+
+                            $param->portal_publish = $tgl." ".$jam;
                             
                             $simpanparam = $param->save();
                             
@@ -162,6 +172,16 @@ class ScrapInews extends Command
                             $param->judul_artikel = $t;
                             $param->link_artikel = $list_url[$s];
                             $param->tanggal_publish = $tanggal[$s];
+
+                            $cek=strpos($tanggal[$s],"WIB",0)-1;
+                            
+                            $tgl=date('Y-m-d');
+
+                            $wib=substr($tanggal[$s],0,$cek);
+
+                            $jam=substr($wib,-8);
+
+                            $param->portal_publish=$tgl." ".$jam;
                             
                             $simpanparam = $param->save();
                             

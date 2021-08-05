@@ -86,10 +86,45 @@ class ScrapSindo extends Command
                             $param = new \App\Models\Scrap\Parameter;
                             $param->tanggal = date('Y-m-d');
                             $param->jam = date('H:i:s');
+
+                            $idcat=explode("/",$list_url[$s]);
+
+                            //cek artikel masuk kategori apa
+                            $cat = \App\Models\Scrap\LinkKategori::where('portal_id',$list_portal->id)
+                                    ->where('name_link_kategori', $idcat[5])
+                                    ->first();
+
+                                    if($cat == null){
+                                        $param->kategori_id = 0;
+                                    }  else{
+                                        $param->kategori_id = $cat['kategori_id'];
+                                    }
+
+                            //cek artikel masuk subkategori apa
+                            $sub = \App\Models\Scrap\LinkSubKategori::where('portal_id',$list_portal->id)
+                                    ->where('name_link_subkategori', $idcat[5])
+                                    ->first();
+                                    if($sub == null){
+                                        $param->subkategori_id = 0;
+                                    }  else{
+                                        $param->subkategori_id = $sub['subkategori_id'];
+                                    }
+
+
                             $param->kanal_id = $kan->id;
                             $param->judul_artikel = $t;
                             $param->link_artikel = $list_url[$s];
                             $param->tanggal_publish = $tanggal[$s];
+
+                            $cek=strpos($tanggal[$s],"WIB",0)-1;
+
+                            $tgl=date('Y-m-d');;
+
+                            $wib=substr($tanggal[$s],0,$cek);
+
+                            $jam=substr($wib,-5);
+
+                            $param->portal_publish = $tgl." ".$jam.":00";
                             
                             $simpanparam = $param->save();
                             
@@ -104,6 +139,8 @@ class ScrapSindo extends Command
                                     $p->parameter_id = $param->id;
                                     $p->kanal_id = $kan->id;
                                     $p->portal_id = $list_portal->id;
+                                    $p->kategori_id = $param->kategori_id;
+                                    $p->subkategori_id = $param->subkategori_id;
                                     $p->save();
                                 }
                             }
@@ -118,6 +155,8 @@ class ScrapSindo extends Command
                                 $p->parameter_id = $cek->id;
                                 $p->kanal_id = $kan->id;
                                 $p->portal_id = $list_portal->id;
+                                $p->kategori_id = $cek->kategori_id;
+                                $p->subkategori_id = $cek->subkategori_id;
                                 $p->save();
                             }
                         }
@@ -162,6 +201,16 @@ class ScrapSindo extends Command
                             $param->judul_artikel = $t;
                             $param->link_artikel = $list_url[$s];
                             $param->tanggal_publish = $tanggal[$s];
+
+                            $cek=strpos($tanggal[$s],"WIB",0)-1;
+
+                            $tgl=date('Y-m-d');;
+
+                            $wib=substr($tanggal[$s],0,$cek);
+
+                            $jam=substr($wib,-5);
+
+                            $param->portal_publish = $tgl." ".$jam.":00";
                             
                             $simpanparam = $param->save();
                             
