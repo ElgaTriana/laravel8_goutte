@@ -108,28 +108,28 @@ class WelcomeController extends Controller
     }
 
     public function sindonews(Request $request){
-        $url = "https://index.sindonews.com/popular";
+        $url = "https://index.sindonews.com/video";
         $client = new Client();
         $crawler = $client->request('GET', $url);
 
         $title=array();
-        $crawler->filter('.indeks-title')->each(function($node) use(&$title){
+        $crawler->filter('.grid-news-title a')->each(function($node) use(&$title){
             $title[]=$node->text();
         });
 
-        $url=array();
-        $crawler->filter('.indeks-title a')->each(function($node) use(&$url){
-            $url[]=$node->attr('href');
+        $list_url=array();
+        $crawler->filter('.grid-news-title a')->each(function($node) use(&$list_url){
+            $list_url[]=$node->attr('href');
         });
 
         $tanggal=array();
-        $crawler->filter('li p')->each(function($node) use(&$tanggal){
+        $crawler->filter('.grid-news-rows div.grid-news-time')->each(function($node) use(&$tanggal){
             $tanggal[]=$node->text();
         });
 
         return array(
             'title'=>$title,
-            'url'=>$url,
+            'url'=>$list_url,
             'tanggal'=>$tanggal,
         );
     }
