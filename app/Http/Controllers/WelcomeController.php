@@ -135,7 +135,7 @@ class WelcomeController extends Controller
     }
 
     public function inewsid(Request $request){
-        $url = "https://www.inews.id/indeks/sport";
+        $url = "https://www.inews.id/indeks/photo/";
         $client = new Client();
         $crawler = $client->request('GET', $url);
 
@@ -148,12 +148,12 @@ class WelcomeController extends Controller
         $crawler->filter('.news-excerpt div.date strong')->each(function($node) use(&$konten){
             $konten[]=$node->text();
         });
-
-        $url=array();
-        $crawler->filter('ul.list-unstyled li a')->each(function($node) use(&$url){
-            $url[]=$node->attr('href');
+        
+        $list_url=array();
+        $crawler->filter('ul.list-unstyled li a')->each(function($node) use(&$list_url){
+            $list_url[]=$node->attr('href');
         });
-
+        
         $tanggal=array();
         $crawler->filter('.news-excerpt div.date')->each(function($node) use(&$tanggal){
             $tanggal[]=$node->text();
@@ -162,7 +162,7 @@ class WelcomeController extends Controller
         return array(
             'title'=>$title,
             'konten'=>$konten,
-            'url'=>$url,
+            'url'=>$list_url,
             'tanggal'=>$tanggal,
         );
     }
