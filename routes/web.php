@@ -35,6 +35,8 @@ Route::group(['prefix'=>'scrapping'], function(){
     Route::get('detik', [WelcomeController::class, 'detik']);
     Route::get('kompas', [WelcomeController::class, 'kompas']);
     Route::get('idxchannel', [WelcomeController::class, 'idxchannel']);
+    Route::get('bola', [WelcomeController::class, 'bola']);
+
     
     Route::get('tokped', [WelcomeController::class, 'tokped']);
     Route::get('tokped-detail-produk', [WelcomeController::class, 'tokped_detail_produk']);

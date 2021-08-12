@@ -82,6 +82,8 @@ class WelcomeController extends Controller
         $crawler->filter('.content-hardnews h3 a')->each(function($node) use(&$title, &$url, &$tanggal, &$konten, &$kontenlast){
             $url[]=$node->link()->getUri();
 
+            // dump($url);
+
             $client = new Client();
             $detail = $client->request('GET', $node->link()->getUri());
 
@@ -280,7 +282,6 @@ class WelcomeController extends Controller
 
     public function liputan6(Request $request)
     {
-        return "sini";
         $url = "https://www.liputan6.com/global/indeks";
         $client = new Client();
         $crawler = $client->request('GET', $url);   
@@ -803,7 +804,7 @@ class WelcomeController extends Controller
 
     public function idxchannel(Request $request){
         
-        $url = "https://www.idxchannel.com/indeks?idkanal=9773&date=2021-07-07";
+        $url = "https://www.idxchannel.com/ecotainment";
         
         $client = new Client();
         
@@ -819,21 +820,64 @@ class WelcomeController extends Controller
             $konten[]=$node->text();
         });
 
-        $url=array();
-        $crawler->filter('.bt-con .tab--content .title-capt a')->each(function($node) use(&$url){
-            $url[]=$node->attr('href');
-            // dump($node->attr('href'));
-        });
-
+        $list_url=array();
         $tanggal=array();
-        $crawler->filter('.bt-con .tab--content> div.headline-date span.mh-clock')->each(function($node) use(&$tanggal){
-            $tanggal[]=$node->text();
+        $crawler->filter('.container-news div.tab--content div.title-capt a')->each(function($node) use(&$list_url, &$tanggal){
+            $list_url[]=$node->link()->getUri();
+
+            $client = new Client();
+            $detail = $client->request('GET', $node->link()->getUri());
+
+            $detail->filter('.article--creator')->each(function ($node_detail) use(&$tanggal){
+                $tanggallast=explode(",", $node_detail->text());
+                $tanggal[]=array_pop($tanggallast);
+            });
         });
 
         return array(
             'title'=>$title,
             'konten'=>$konten,
-            'url'=>$url,
+            'url'=>$list_url,
+            'tanggal'=>$tanggal,
+        );
+    }
+
+    public function bola(Request $request){
+
+        $url = "https://www.bola.com/indonesia/indeks/2021/08/10";
+        
+        $client = new Client();
+        
+        $crawler = $client->request('GET', $url);
+
+        $title=array();
+        $crawler->filter('.articles--rows--item__title-link')->each(function ($node) use(&$title) {
+            // dump($node->attr('title')); 
+            $title[]=$node->attr('title');
+        });
+
+        $list_url=array();
+            $crawler->filter('.articles--rows--item__title-link')->each(function($node) use(&$list_url){
+            // dump($node->attr('href')); 
+            $list_url[]= $node->attr("href");
+        });
+
+        $tanggal=array();
+        $crawler->filter('.articles--rows--item__time')->each(function($node) use(&$tanggal){
+            // dump($node->text());
+            $tanggal[]=$node->text();
+        });
+
+        $konten=array();
+        $crawler->filter('.articles--rows--item__category')->each(function($node) use(&$konten){
+            // dump($node->text());
+            $konten[]=$node->text();
+        });
+
+        return array(
+            'title'=>$title,
+            'konten'=>$konten,
+            'url'=>$list_url,
             'tanggal'=>$tanggal,
         );
     }
