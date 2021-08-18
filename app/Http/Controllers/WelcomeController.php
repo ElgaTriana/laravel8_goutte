@@ -881,4 +881,161 @@ class WelcomeController extends Controller
             'tanggal'=>$tanggal,
         );
     }
+
+    public function cnbc(Request $request){
+
+        $url = "https://www.cnbcindonesia.com/video";
+        
+        $client = new Client();
+        
+        $crawler = $client->request('GET', $url);
+
+        // Video
+        $title=array();
+        $crawler->filter('.list li article h2')->each(function ($node) use(&$title) {
+            $title[]=$node->text();
+        });
+
+        $list_url=array();
+        $crawler->filter('.list li article a')->each(function ($node) use(&$list_url) {
+           $list_url[]=$node->attr('href');
+        });
+
+        $konten=array();
+        $crawler->filter('.list li article span.subjudul')->each(function ($node) use(&$konten) {
+            $konten[]=$node->text();
+        });
+
+        $tanggal=array();
+        $crawler->filter('.list li article a')->each(function($node) use(&$tanggal){
+            $client = new Client();
+            $detail = $client->request('GET', $node->link()->getUri());
+
+            $detail->filter('.detail_box div.date')->each(function ($node_detail) use(&$tanggal){
+                $tanggal[]=$node_detail->text();
+            });
+        });
+
+        // FOTO
+        // $title=array();
+        // $crawler->filter('.nhl_foto h2')->each(function ($node) use(&$title) {
+        //     $title[]=$node->text();
+        // });
+
+        // $list_url=array();
+        // $crawler->filter('.nhl_foto div.col_mob_9 a')->each(function ($node) use(&$list_url) {
+        //     $list_url[]= $node->attr('href');
+        //     // dump($list_url);
+        // });
+
+        // $tanggal=array();
+        // $crawler->filter('.nhl_foto article a')->each(function($node) use(&$tanggal){
+        //     $client = new Client();
+        //     $detail = $client->request('GET', $node->link()->getUri());
+
+        //     $detail->filter('.detail_box div.date')->each(function ($node_detail) use(&$tanggal){
+        //         // dump($node_detail->text());
+        //         $tanggal[]=$node_detail->text();
+        //     });
+        // });
+        
+        // ARTIKEL
+        // $crawler = $client->request('GET', $url."?date=".date('Y/m/d'));
+        // $title=array();
+        // $crawler->filter('.lm_content ul.list li h2')->each(function ($node) use(&$title) {
+        //     // dump($node->text()); 
+        //     $title[]=$node->text();
+        // });
+
+        // $tanggal=array();
+        // $konten=array();
+        // $list_url=array();
+        //     $crawler->filter('.lm_content ul.list li a')->each(function($node) use(&$list_url, &$tanggal, &$konten){
+        //     $list_url[]= $node->link()->getUri();
+
+        //     $client = new Client();
+        //     $detail = $client->request('GET', $node->link()->getUri());
+
+        //     $detail->filter('.detail_box div.date')->each(function ($node_detail) use(&$tanggal){
+        //         $tanggal[]=$node_detail->text();
+        //     });
+
+        //     $detail->filter('.detail_box div.author span.label')->each(function ($node_detail) use(&$konten){
+        //         $konten[]=explode(" ", $node_detail->text())[0];
+        //     });
+        // });
+
+        return array(
+            'title'=>$title,
+            'konten'=>$konten,
+            'url'=>$list_url,
+            'tanggal'=>$tanggal,
+        );
+    }
+
+    public function celebritis(Request $request){
+        $url = "https://www.celebrities.id/entertainment";
+        
+        $client = new Client();
+        
+        $crawler = $client->request('GET', $url);
+
+        // // Foto & Video
+        // $title=array();
+        // $crawler->filter('.item div.title a')->each(function ($node) use(&$title) {
+        //     $title[]=$node->text();
+        // });
+
+        // $list_url=array();
+        // $tanggal=array();
+        // $crawler->filter('.item div.title a')->each(function ($node) use(&$list_url, &$tanggal) {
+            
+        //     $list_url[]=$node->link()->getUri();
+
+        //     $client = new Client();
+        //     $detail = $client->request('GET', $node->link()->getUri());
+
+        //     $detail->filter('.info div.content-left div.date')->each(function ($node_detail) use(&$tanggal){
+        //         $tanggal[]=$node_detail->text();
+        //     });
+        // });
+
+        // $konten=array();
+        // $crawler->filter('.item div.caption a.category ')->each(function ($node) use(&$konten) {
+        //     $konten[]=strtoupper($node->text());
+        // });
+
+        // Artikel
+        $title=array();
+        $crawler->filter('.item div.caption a.title')->each(function ($node) use(&$title) {
+            $title[]=$node->text();
+        });
+
+        $list_url=array();
+        $tanggal=array();
+        $konten=array();
+        $crawler->filter('.item div.caption a.title')->each(function ($node) use(&$list_url, &$tanggal, &$konten) {
+            
+            $list_url[]=$node->link()->getUri();
+
+            $client = new Client();
+            $detail = $client->request('GET', $node->link()->getUri());
+
+            $detail->filter('.info div.content-left div.date')->each(function ($node_detail) use(&$tanggal){
+                $tanggal[]=$node_detail->text();
+            });
+
+            $detail->filter('.item.active')->each(function ($node_detail) use(&$konten){
+                $konten[]=$node_detail->text();
+                // dump($node_detail->text());
+            });
+        });
+
+        return array(
+            'title'=>count($title),
+            'konten'=>count($konten),
+            'url'=>count($list_url),
+            'tanggal'=>count($tanggal),
+        );
+    }
 }
