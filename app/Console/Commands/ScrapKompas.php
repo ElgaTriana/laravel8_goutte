@@ -192,25 +192,32 @@ class ScrapKompas extends Command
                 $this->info('Menarik Data Kanal Populer == '.$kan->url_kanal);
 
                 $client = new Client();
+
                 $url = $kan->url_kanal;
+                
                 $crawler = $client->request('GET', $url);
+                
+                $title=array();
+
+                $list_url=array();
+
+                $tanggal = array();
+                
+                $konten= array();
+
+                $dibaca = array();
 
                 $crawler->filter('.most')->each(function ($node) use(&$list, &$kan, &$list_portal){
                     
-                    $title=array();
                     $node->filter('h4.most__title')->each(function($t) use(&$title){
                         $title[]=$t->text();
                     });
 
-                    $list_url=array();
-                    $tanggal = array();
-                    $konten= array();
-                    $subkonten= array();
-
-                    $node->filter('.most__link')->each(function($t) use(&$list_url, &$tanggal, &$konten, &$subkonten){
+                    $node->filter('.most__link')->each(function($t) use(&$list_url, &$tanggal, &$konten){
                         $list_url[]= $t->link()->getUri();
 
                     $client = new Client();
+                    
                     $detail = $client->request('GET', $t->link()->getUri());
                         $detail->filter('.js-read-article')->each(function ($dt) use(&$tanggal){
                             $dt->filter('.read__time')->each(function($tl) use(&$tanggal){
@@ -218,36 +225,22 @@ class ScrapKompas extends Command
                             });
                         });
 
-                        $detail->filter('.breadcrumb__wrap')->each(function ($dt) use(&$konten, &$subkonten){
-                            $konten[]=$dt->text();
-                            $subkonten[]=$konten[count($konten) - 1];
-                        });
+                        $konten[]=$detail->filter('.breadcrumb__wrap span')->last()->text();
                     });
 
                     $list_url = array_values(array_unique($list_url));
 
-                    $dibaca = array();
                     $node->filter('.most__read')->each(function($t) use(&$dibaca){
                         $dibaca[]= $t->text();
                     });
-
-                    $tesya=array();
-
-                    foreach($subkonten as $char){
-                        $exploded_array = explode(" ", $char);
-                        $yohoho=end($exploded_array);
-                        array_push($tesya, $yohoho);
-                    }
 
                     $list=array(
                         'title'=>$title,
                         'url'=>$list_url,
                         'tanggal'=>$tanggal,
-                        'subkonten'=>$tesya,
+                        'konten'=>$konten,
                         'dibaca'=>$dibaca
                     );
-
-                    dump($list);
 
                     if(count($title) == count($tanggal))
                     {
@@ -266,7 +259,7 @@ class ScrapKompas extends Command
 
                                 //cek artikel masuk kategori apa
                                 $cat = \App\Models\Scrap\LinkKategori::where('portal_id',$list_portal->id)
-                                        ->where('name_link_kategori', $tesya[$s])
+                                        ->where('name_link_kategori', $konten[$s])
                                         ->first();
 
                                         if($cat == null){
@@ -277,7 +270,7 @@ class ScrapKompas extends Command
 
                                 //cek artikel masuk subkategori apa
                                 $sub = \App\Models\Scrap\LinkSubKategori::where('portal_id',$list_portal->id)
-                                        ->where('name_link_subkategori', $tesya[$s])
+                                        ->where('name_link_subkategori', $konten[$s])
                                         ->first();
                                        if($sub == null){
                                             $param->subkategori_id = 0;
@@ -292,7 +285,7 @@ class ScrapKompas extends Command
                                 $param->judul_artikel = $t;
                                 $param->link_artikel = $list_url[$s];
                                 $param->tanggal_publish = $tanggal[$s];
-                                $param->konten = $tesya[$s];
+                                $param->konten = $konten[$s];
 
 
                                 $word="WIB";
@@ -330,6 +323,8 @@ class ScrapKompas extends Command
                                         $p->parameter_id = $param->id;
                                         $p->kanal_id = $kan->id;
                                         $p->portal_id = $list_portal->id;
+                                        $p->kategori_id = $param->kategori_id;
+                                        $p->subkategori_id = $param->subkategori_id;
                                         $p->save();
                                     }
                                 }

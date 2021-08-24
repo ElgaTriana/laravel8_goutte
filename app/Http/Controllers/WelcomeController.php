@@ -700,42 +700,38 @@ class WelcomeController extends Controller
 
     public function kompas(Request $request){
 
-        $url = "https://lifestyle.kompas.com/";
+        $url = "https://otomotif.kompas.com/news";
+
         $client = new Client();
+
         $crawler = $client->request('GET', $url);
 
-        $konten=array();
-
         $crawler->filter('.most')->each(function ($node) use(&$list, &$kan, &$list_portal){
-
+                    
             $title=array();
+
+            $list_url=array();
+            
+            $tanggal = array();
+            
+            $konten= array();
+
             $node->filter('h4.most__title')->each(function($t) use(&$title){
                 $title[]=$t->text();
             });
 
-            $list_url=array();
-            $tanggal = array();
-            $konten= array();
-            $subkonten= array();
-
             $node->filter('.most__link')->each(function($t) use(&$list_url, &$tanggal, &$konten, &$subkonten){
                 $list_url[]= $t->link()->getUri();
 
-                $client = new Client();
-                $detail = $client->request('GET', $t->link()->getUri());
+            $client = new Client();
+            $detail = $client->request('GET', $t->link()->getUri());
                 $detail->filter('.js-read-article')->each(function ($dt) use(&$tanggal){
                     $dt->filter('.read__time')->each(function($tl) use(&$tanggal){
                         $tanggal[]=$tl->text();
-                        // dump($tanggal);
                     });
                 });
 
-                $detail->filter('.breadcrumb__wrap')->each(function ($dt) use(&$konten, &$subkonten){
-                    $konten[]=$dt->text();
-                    $subkonten[]=$konten[count($konten) - 1];
-                    // dump($subkonten);
-                });
-
+                $konten[]=$detail->filter('.breadcrumb__wrap span')->last()->text();
             });
 
             $list_url = array_values(array_unique($list_url));
@@ -747,24 +743,63 @@ class WelcomeController extends Controller
 
             $tesya=array();
 
-            foreach($subkonten as $char){
-                $exploded_array = explode(" ", $char);
-                $yohoho=end($exploded_array);
-                array_push($tesya, $yohoho);
-            }
-
-            dump($subkonten);
-
-            // dump($tesya);
-
             $list=array(
                 'title'=>$title,
                 'url'=>$list_url,
                 'tanggal'=>$tanggal,
-                'subkonten'=>$tesya,
+                'konten'=>$konten,
                 'dibaca'=>$dibaca
             );
+
+            dump($list);
         });
+
+
+        // $crawler->filter('.most')->each(function ($node) use(&$list, &$kan, &$list_portal){
+
+        //     $node->filter('h4.most__title')->each(function($t) use(&$title){
+        //         $title[]=$t->text();
+        //     });
+
+        //     $node->filter('.most__link')->each(function($t) use(&$list_url, &$tanggal, &$konten, &$subkonten){
+        //         $list_url[]= $t->link()->getUri();
+
+        //         $client = new Client();
+        //         $detail = $client->request('GET', $t->link()->getUri());
+        //         $detail->filter('.js-read-article')->each(function ($dt) use(&$tanggal){
+        //             $dt->filter('.read__time')->each(function($tl) use(&$tanggal){
+        //                 $tanggal[]=$tl->text();
+        //                 // dump($tanggal);
+        //             });
+        //         });
+
+        //         $detail->filter('.breadcrumb__wrap')->each(function ($dt) use(&$konten, &$subkonten){
+        //             $konten[]=$dt->text();
+        //             $subkonten[]=$konten[count($konten) - 1];
+        //             // dump($subkonten);
+        //         });
+
+        //     });
+
+        //     $list_url = array_values(array_unique($list_url));
+
+        //     $dibaca = array();
+        //     $node->filter('.most__read')->each(function($t) use(&$dibaca){
+        //         $dibaca[]= $t->text();
+        //     });
+
+        //     $tesya=array();
+
+        //     foreach($subkonten as $char){
+        //         $exploded_array = explode(" ", $char);
+        //         $yohoho=end($exploded_array);
+        //         array_push($tesya, $yohoho);
+        //     }
+
+        //     // dump($subkonten);
+
+        //     // dump($tesya);
+        // });
 
         // $url = "https://indeks.kompas.com/?site=homey";
         // $client = new Client();
