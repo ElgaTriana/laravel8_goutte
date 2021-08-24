@@ -38,6 +38,7 @@ Route::group(['prefix'=>'scrapping'], function(){
     Route::get('bola', [WelcomeController::class, 'bola']);
     Route::get('cnbc', [WelcomeController::class, 'cnbc']);
     Route::get('celebritis', [WelcomeController::class, 'celebritis']);
+    Route::get('kapanlagi', [WelcomeController::class, 'kapanlagi']);
 
     
     Route::get('tokped', [WelcomeController::class, 'tokped']);
