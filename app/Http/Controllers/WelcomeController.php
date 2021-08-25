@@ -1075,53 +1075,79 @@ class WelcomeController extends Controller
     }
 
     public function kapanlagi(Request $request){
-        $url = "https://video.kapanlagi.com/";
+        $url = "https://www.kapanlagi.com/dangdut";
         
         $client = new Client();
         
         $crawler = $client->request('GET', $url);
 
         $title=array();
+                        
+        $list_url=array();
         
         $tanggal=array();
         
-        $list_url=array();
-
         $konten=array();
-
-        $crawler->filter('#v6-tags-populer #tagli img')->each(function ($node) use(&$title) {
-            $title[]=$node->attr('alt');
+        
+        $crawler->filter('.col-vid-art p a')->each(function ($node) use(&$title) {
+            $title[]=$node->text();
         });
-
-        $crawler->filter('#v6-tags-populer #tagli div.desc a')->each(function ($node) use(&$list, &$list_url, &$konten, &$tanggal, &$title) {
-            // dump($node->attr('href'));
+        
+        $crawler->filter('.col-vid-art p a')->each(function ($node) use(&$list_url, &$tanggal, &$konten) {
             $list_url[]=$node->link()->getUri();
-
-            if (($key = array_search("https://video.kapanlagi.com/", $list_url)) !== false) {
-                unset($list_url[$key]);
-            }
 
             $client = new Client();
             $detail = $client->request('GET', $node->link()->getUri());
 
-            $detail->filter('.headline-detail-video div.col-dt-headline span.date-post')->each(function ($node_detail) use(&$tanggal) {
+            $konten[]="VIDEO";
+
+            $detail->filter('.col-dt-left span.date-post')->each(function ($node_detail) use(&$tanggal){
                 $tanggal[]=$node_detail->text();
             });
-
-            $list=array(
-                'title'=>$title,
-                'url'=>array_merge($list_url),
-                'tanggal'=>$tanggal,
-                'dibaca'=>array()
-            );
         });
-        return $list;
         
-        // return array(
-        //     'title'=>count($title),
-        //     'konten'=>count($konten),
-        //     'url'=>count($list_url),
-        //     'tanggal'=>count($tanggal)
-        // );
+
+        // $title=array();
+        
+        // $tanggal=array();
+        
+        // $list_url=array();
+
+        // $konten=array();
+
+        // $crawler->filter('#v6-tags-populer #tagli img')->each(function ($node) use(&$title) {
+        //     $title[]=$node->attr('alt');
+        // });
+
+        // $crawler->filter('#v6-tags-populer #tagli div.desc a')->each(function ($node) use(&$list, &$list_url, &$konten, &$tanggal, &$title) {
+        //     // dump($node->attr('href'));
+        //     $list_url[]=$node->link()->getUri();
+
+        //     if (($key = array_search("https://video.kapanlagi.com/", $list_url)) !== false) {
+        //         unset($list_url[$key]);
+        //     }
+
+        //     $client = new Client();
+        //     $detail = $client->request('GET', $node->link()->getUri());
+
+        //     $detail->filter('.headline-detail-video div.col-dt-headline span.date-post')->each(function ($node_detail) use(&$tanggal) {
+        //         $tanggal[]=$node_detail->text();
+        //     });
+
+        //     $list=array(
+        //         'title'=>$title,
+        //         'url'=>array_merge($list_url),
+        //         'tanggal'=>$tanggal,
+        //         'dibaca'=>array()
+        //     );
+        // });
+        // return $list;
+        
+        return array(
+            'title'=>$title,
+            'konten'=>$konten,
+            'url'=>$list_url,
+            'tanggal'=>$tanggal
+        );
     }
 }

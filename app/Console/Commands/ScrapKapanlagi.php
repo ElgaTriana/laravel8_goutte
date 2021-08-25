@@ -463,7 +463,7 @@ class ScrapKapanlagi extends Command
                             $client = new Client();
                             $detail = $client->request('GET', $node->link()->getUri());
 
-                            $konten[]="KABAR DANGDUT";
+                            $konten[]="VIDEO";
 
                             $detail->filter('.col-dt-left span.date-post')->each(function ($node_detail) use(&$tanggal){
                                 $tanggal[]=$node_detail->text();
